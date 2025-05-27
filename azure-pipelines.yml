@@ -38,7 +38,7 @@ steps:
 - script: |
     ssh ${BACKEND_USER}@${BACKEND_IP} "
     cd ${APP_DIR} &&
-    source venv/bin/active &&
+    source venv/bin/activate &&
     pip -r requirement.txt &&
     sudo venv/bin/python3 fundoo/manage.py makemigrations &&
     sudo venv/bin/python3 fundoo/manage.py migrate "
