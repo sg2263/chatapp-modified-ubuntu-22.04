@@ -43,3 +43,8 @@ steps:
     sudo venv/bin/python3 fundoo/manage.py makemigrations &&
     sudo venv/bin/python3 fundoo/manage.py migrate "
   displayName: 'Build Successful'
+
+- script: |
+    ssh ${BACKEND_USER}@${BACKEND_IP} "
+      sudo systemctl restart django 
+  displayName: 'Restart Server'
