@@ -12,8 +12,15 @@ pool:
 steps:
 - script: |
     ssh azureuser@10.0.3.4 "
-      git config --global --add safe.directory /tmp && 
-      cd /tmp/az-chatapp && 
-      git pull origin main "
-  displayName: 'Pull code in Django VM'
+      # Remove existing directory if it exists
+      rm -rf /tmp/az-chatapp &&
+      # Create fresh directory
+      mkdir -p /tmp/az-chatapp &&
+      # Clone repository (replace with your actual repo URL)
+      git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git /tmp/az-chatapp &&
+      # Navigate to directory
+      cd /tmp/az-chatapp &&
+      # Pull latest changes
+      git pull origin main"
+  displayName: 'Clone and update repository'
 
