@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
@@ -17,23 +12,25 @@ variables:
 
 steps:
 - script: |
-    ssh ${BACKEND_USER}@${BACKEND_IP}"
+    ssh ${BACKEND_USER}@${BACKEND_IP} "
       # Remove existing directory if it exists
-      rm -rf /tmp/az-chatapp &&
+      rm -rf ${TMP_DIR} &&
       # Create fresh directory
-      mkdir -p /tmp/az-chatapp &&
-      # Clone repository (replace with your actual repo URL)
+      mkdir -p ${TMP_DIR} &&
+      # Clone repository
       git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} &&
       # Navigate to directory
-      cd /tmp/az-chatapp &&
+      cd ${TMP_DIR} &&
       # Pull latest changes
       git pull origin main"
   displayName: 'Clone and update repository'
 
 - script: |
-    ssh ${BACKEND_USER}@${BACKEND_IP}"
-    mv ${TMP_DIR}/requirements.txt ${APP_DIR} &&
-    sudo rm -rf ${APP_DIR}/fundoo &&
-    mv ${TMP_DIR}/fundoo ${APP_DIR}"
+    ssh ${BACKEND_USER}@${BACKEND_IP} "
+      # Copy requirements file
+      cp ${TMP_DIR}/requirements.txt ${APP_DIR}/ &&
+      # Remove old directory if exists
+      sudo rm -rf ${APP_DIR}/fundoo &&
+      # Move new files
+      sudo mv ${TMP_DIR}/fundoo ${APP_DIR}/"
   displayName: 'Changes migrated'
-
