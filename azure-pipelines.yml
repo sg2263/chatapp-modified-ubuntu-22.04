@@ -11,7 +11,7 @@ pool:
 
 steps:
 - script: |
-    ssh azureuser@10.0.3.6 "cd /tmp && git pull origin main"
+    ssh azureuser@10.0.3.4 "cd /tmp && git pull origin main"
   displayName: 'Pull code in Django VM'
 
 
