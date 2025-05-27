@@ -13,7 +13,7 @@ steps:
 - script: |
     ssh azureuser@10.0.3.4 "
       git config --global --add safe.directory /tmp && 
-      cd /tmp && 
+      cd /tmp/az-chatapp && 
       git pull origin main "
   displayName: 'Pull code in Django VM'
 
