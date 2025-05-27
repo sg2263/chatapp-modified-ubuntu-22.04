@@ -9,18 +9,31 @@ trigger:
 pool:
   name: Default
 
+variables:
+  BACKEND_IP: "10.0.3.4"
+  BACKEND_USER: "azureuser"
+  APP_DIR: "/django-app/chatapp-modified-ubuntu-22.04"
+  TMP_DIR: "/tmp/az-chatapp"
+
 steps:
 - script: |
-    ssh azureuser@10.0.3.4 "
+    ssh ${BACKEND_USER}@{BACKEND_IP}"
       # Remove existing directory if it exists
       rm -rf /tmp/az-chatapp &&
       # Create fresh directory
       mkdir -p /tmp/az-chatapp &&
       # Clone repository (replace with your actual repo URL)
-      git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git /tmp/az-chatapp &&
+      git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} &&
       # Navigate to directory
       cd /tmp/az-chatapp &&
       # Pull latest changes
       git pull origin main"
   displayName: 'Clone and update repository'
+
+- script: |
+    ssh ${BACKEND_USER}@{BACKEND_IP}"
+    mv ${TMP_DIR}/requirements.txt ${APP_DIR} &&
+    sudo rm -rf ${APP_DIR}/fundoo &&
+    mv ${TMP_DIR}/fundoo ${APP_DIR}"
+  displayName: 'Changes migrated'
 
