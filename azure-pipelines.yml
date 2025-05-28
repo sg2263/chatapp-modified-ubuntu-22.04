@@ -9,6 +9,8 @@ variables:
   BACKEND_USER: "azureuser"
   APP_DIR: "/django-app/chatapp-modified-ubuntu-22.04"
   TMP_DIR: "/tmp/az-chatapp"
+  buildOutput: 'artifact_output'
+  
 
 stages:
 
@@ -54,12 +56,9 @@ stages:
           sudo venv/bin/python3 fundoo/manage.py makemigrations &&
           sudo venv/bin/python3 fundoo/manage.py migrate "
         displayName: 'Build Successful'
-- stage: DeployStage
-  jobs:
-    - job: Deploy
-      steps:
-        - script: 
-            ssh ${BACKEND_USER}@${BACKEND_IP} "
-            sudo systemctl restart django "
-          displayName: 'Restart Server'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(artifact_output)'
+          ArtifactName: 'drop'
+          publishLocation: Container
 
