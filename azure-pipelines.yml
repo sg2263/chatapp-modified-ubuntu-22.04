@@ -23,11 +23,11 @@ steps:
       
       # Build steps
       cd ${ARTIFACT_DIR}/src &&
-      python -m venv venv &&
+      python3.8 -m venv venv &&
       source venv/bin/activate &&
       pip install -r requirements.txt &&
-      python fundoo/manage.py makemigrations &&
-      python fundoo/manage.py migrate &&
+      venv/bin/python3 fundoo/manage.py makemigrations &&
+      venv/bin/python3 fundoo/manage.py migrate &&
       
       # Freeze dependencies and package
       pip freeze > requirements.lock &&
