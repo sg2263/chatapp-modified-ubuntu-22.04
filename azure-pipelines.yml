@@ -56,9 +56,16 @@ stages:
           sudo venv/bin/python3 fundoo/manage.py makemigrations &&
           sudo venv/bin/python3 fundoo/manage.py migrate "
         displayName: 'Build Successful'
+      - script: |
+          mkdir -p $(Build.ArtifactStagingDirectory)
+          scp -r ${BACKEND_USER}@${BACKEND_IP}:${APP_DIR}/fundoo $(Build.ArtifactStagingDirectory)/
+        displayName: 'Copy fundoo folder from backend to agent'
+
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: '$(artifact_output)'
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/fundoo'
           ArtifactName: 'drop'
           publishLocation: Container
+        displayName: 'Publish fundoo as artifact'
+
 
