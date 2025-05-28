@@ -27,8 +27,8 @@ steps:
       source venv/bin/activate &&
       pip install -r requirements.txt &&
       pip install python-dotenv
-      sudo venv/bin/python3 fundoo/manage.py makemigrations &&
-      sudo venv/bin/python3 fundoo/manage.py migrate &&
+      sudo venv/bin/python3.8 fundoo/manage.py makemigrations &&
+      sudo venv/bin/python3.8 fundoo/manage.py migrate &&
       
       # Freeze dependencies and package
       pip freeze > requirements.lock &&
