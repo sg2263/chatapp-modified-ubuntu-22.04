@@ -11,51 +11,41 @@ variables:
   TMP_DIR: "/tmp/az-chatapp"
 
 stages:
-
-- stage: FetchCode
-  displayName: 'Clone & Prepare Code'
+- stage: FetchCodeStage
+  displayName: 'Clone and Prepare Code'
   jobs:
   - job: clone
     steps:
     - script: |
-        ssh ${BACKEND_USER}@${BACKEND_IP} << 'EOF'
-        rm -rf ${TMP_DIR}
-        mkdir -p ${TMP_DIR}
-        git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR}
-        cd ${TMP_DIR}
-        git pull origin main
-        EOF
+        ssh ${BACKEND_USER}@${BACKEND_IP} "
+          rm -rf ${TMP_DIR} &&
+          mkdir -p ${TMP_DIR} &&
+          git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} &&
+          cd ${TMP_DIR} &&
+          git pull origin main"
       displayName: 'Clone and update repository'
 
-    - script: |
-        ssh ${BACKEND_USER}@${BACKEND_IP} << 'EOF'
-        cp ${TMP_DIR}/requirements.txt ${APP_DIR}/
-        sudo rm -rf ${APP_DIR}/fundoo
-        sudo mv ${TMP_DIR}/fundoo ${APP_DIR}/
-        EOF
-      displayName: 'Changes migrated'
-
-
-- stage: BuildBackend
-  displayName: 'Build and Migrate'
+- stage: BuildStage
+  displayName: 'Build and Deploy'
   jobs:
-  - job: build
-    steps:
-    - script: |
-        ssh ${BACKEND_USER}@${BACKEND_IP} << 'EOF'
-        cd ${APP_DIR}
-        source venv/bin/activate
-        pip install -r requirements.txt
-        sudo venv/bin/python3 fundoo/manage.py makemigrations
-        sudo venv/bin/python3 fundoo/manage.py migrate
-        EOF
-      displayName: 'Run Backend Build'
+    - job: build
+      steps:
+      - script: |
+          ssh ${BACKEND_USER}@${BACKEND_IP} "
+            cp ${TMP_DIR}/requirements.txt ${APP_DIR}/ &&
+            sudo rm -rf ${APP_DIR}/fundoo &&
+            sudo mv tmp/fundoo ${APP_DIR}/"
+        displayName: 'Copy application files'
 
-- stage: Restart
-  displayName: 'Restart Django Service'
-  jobs:
-  - job: restart
-    steps:
-    - script: |
-        ssh ${BACKEND_USER}@${BACKEND_IP} "sudo systemctl restart django"
-      displayName: 'Restart Django Service'
+      - script: |
+          ssh ${BACKEND_USER}@${BACKEND_IP} "
+            cd ${APP_DIR} &&
+            source venv/bin/activate &&
+            pip install -r requirements.txt &&
+            python fundoo/manage.py makemigrations &&
+            python fundoo/manage.py migrate"
+        displayName: 'Install dependencies and run migrations'
+
+      - script: |
+          ssh ${BACKEND_USER}@${BACKEND_IP} "sudo systemctl restart django"
+        displayName: 'Restart Django service'
