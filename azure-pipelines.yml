@@ -54,18 +54,19 @@ stages:
           source venv/bin/activate &&
           pip install -r requirements.txt &&
           sudo venv/bin/python3 fundoo/manage.py makemigrations &&
-          sudo venv/bin/python3 fundoo/manage.py migrate "
+          sudo venv/bin/python3 fundoo/manage.py migrate 
+          tar -czf ${ARTIFACT_DIR}/django-app.tar.gz -C ${ARTIFACT_DIR}/src ."
         displayName: 'Build Successful'
+        
       - script: |
-          mkdir -p $(Build.ArtifactStagingDirectory)
-          scp -r ${BACKEND_USER}@${BACKEND_IP}:${APP_DIR}/fundoo $(Build.ArtifactStagingDirectory)/
-        displayName: 'Copy fundoo folder from backend to agent'
+          # Download artifact from backend VM to Azure DevOps
+          scp ${BACKEND_USER}@${BACKEND_IP}:${ARTIFACT_DIR}/django-app.tar.gz $(Build.ArtifactStagingDirectory)/
+        displayName: 'Fetch artifact'
 
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/fundoo'
-          ArtifactName: 'drop'
-          publishLocation: Container
-        displayName: 'Publish fundoo as artifact'
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/django-app.tar.gz'
+          ArtifactName: 'django-app'
+        displayName: 'Publish artifact'
 
 
