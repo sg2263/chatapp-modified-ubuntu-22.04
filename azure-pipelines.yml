@@ -21,10 +21,7 @@ stages:
     steps:
     - script: |
         ssh ${BACKEND_USER}@${BACKEND_IP} "
-          # Remove existing directory if it exists
-          rm -rf ${TMP_DIR} &&
-          # Create fresh directory
-          mkdir -p ${TMP_DIR} &&
+          
           # Clone repository
           git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} &&
           # Navigate to directory
@@ -45,7 +42,7 @@ stages:
             # Remove old directory if exists
             sudo rm -rf ${APP_DIR}/fundoo &&
             # Move new files
-            sudo mv ${TMP_DIR}/fundoo ${APP_DIR}/"
+            sudo mv /tmp/fundoo ${APP_DIR}/"
         displayName: 'Changes migrated'
 
       - script: |
