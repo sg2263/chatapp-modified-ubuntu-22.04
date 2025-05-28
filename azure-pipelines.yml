@@ -33,26 +33,26 @@ stages:
           git pull origin main"
       displayName: 'Clone and update repository'
 
-# - stage: BuildStage
-#   displayName: 'Build Code'
-#   jobs:
-#     - job: build
-#       steps: 
-#       - script: |
-#           ssh ${BACKEND_USER}@${BACKEND_IP} "
-#             # Copy requirements file
-#             cp ${TMP_DIR}/requirements.txt ${APP_DIR}/ &&
-#             # Remove old directory if exists
-#             sudo rm -rf ${APP_DIR}/fundoo &&
-#             # Move new files
-#             sudo mv ${TMP_DIR}/fundoo ${APP_DIR}/"
-#         displayName: 'Changes migrated'
+- stage: BuildStage
+  displayName: 'Build Code'
+  jobs:
+    - job: build
+      steps: 
+      - script: |
+          ssh ${BACKEND_USER}@${BACKEND_IP} "
+            # Copy requirements file
+            cp ${TMP_DIR}/requirements.txt ${APP_DIR}/ &&
+            # Remove old directory if exists
+            sudo rm -rf ${APP_DIR}/fundoo &&
+            # Move new files
+            sudo mv ${TMP_DIR}/fundoo ${APP_DIR}/"
+        displayName: 'Changes migrated'
 
-#       - script: |
-#           ssh ${BACKEND_USER}@${BACKEND_IP} "
-#           cd ${APP_DIR} &&
-#           source venv/bin/activate &&
-#           pip install -r requirements.txt &&
-#           sudo venv/bin/python3 fundoo/manage.py makemigrations &&
-#           sudo venv/bin/python3 fundoo/manage.py migrate "
-#         displayName: 'Build Successful'
+      - script: |
+          ssh ${BACKEND_USER}@${BACKEND_IP} "
+          cd ${APP_DIR} &&
+          source venv/bin/activate &&
+          pip install -r requirements.txt &&
+          sudo venv/bin/python3 fundoo/manage.py makemigrations &&
+          sudo venv/bin/python3 fundoo/manage.py migrate "
+        displayName: 'Build Successful'
