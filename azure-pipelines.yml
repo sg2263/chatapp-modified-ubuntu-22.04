@@ -26,6 +26,7 @@ steps:
       python3.8 -m venv venv &&
       source venv/bin/activate &&
       pip install -r requirements.txt &&
+      pip install python-dotenv
       venv/bin/python3 fundoo/manage.py makemigrations &&
       venv/bin/python3 fundoo/manage.py migrate &&
       
