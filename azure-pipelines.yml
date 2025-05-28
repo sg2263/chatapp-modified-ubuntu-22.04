@@ -34,7 +34,7 @@ stages:
           ssh ${BACKEND_USER}@${BACKEND_IP} "
             cp ${TMP_DIR}/requirements.txt ${APP_DIR}/ &&
             sudo rm -rf ${APP_DIR}/fundoo &&
-            sudo mv tmp/fundoo ${APP_DIR}/"
+            sudo mv /tmp/az-chatapp/fundoo ${APP_DIR}/"
         displayName: 'Copy application files'
 
       - script: |
