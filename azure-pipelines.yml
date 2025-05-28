@@ -23,7 +23,7 @@ steps:
       
       # Build steps
       cd ${ARTIFACT_DIR}/src &&
-      python -m venv venv &&
+      python3 -m venv venv &&
       source venv/bin/activate &&
       pip install -r requirements.txt &&
       venv/bin/python3 fundoo/manage.py makemigrations &&
