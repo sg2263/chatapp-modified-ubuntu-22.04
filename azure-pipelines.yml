@@ -24,11 +24,11 @@ stages:
           # Create fresh directory
           mkdir -p ${TMP_DIR} &&
           # Clone repository
-          git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} &&
-          # Navigate to directory
-          cd ${TMP_DIR} &&
-          # Pull latest changes
-          git pull origin main"
+          git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} "
+          # # Navigate to directory
+          # cd ${TMP_DIR} &&
+          # # Pull latest changes
+          # git pull origin main"
       displayName: 'Clone and update repository'
 
 - stage: BuildStage
