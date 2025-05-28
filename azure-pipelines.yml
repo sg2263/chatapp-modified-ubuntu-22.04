@@ -1,64 +1,46 @@
+# azure-pipelines-build.yml
 trigger:
-- main
+- main  # Runs on code push
 
 pool:
-  name: Default
+  name: Default  # Your self-hosted agent pool
 
 variables:
   BACKEND_IP: "10.0.3.4"
   BACKEND_USER: "azureuser"
   APP_DIR: "/django-app/chatapp-modified-ubuntu-22.04"
-  TMP_DIR: "/tmp/az-chatapp"
+  ARTIFACT_DIR: "/tmp/build-artifacts"  # On backend VM
 
-stages:
+steps:
+- script: |
+    ssh ${BACKEND_USER}@${BACKEND_IP} "
+      # Clean and setup
+      rm -rf ${ARTIFACT_DIR} &&
+      mkdir -p ${ARTIFACT_DIR} &&
+      
+      # Clone fresh code
+      git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${ARTIFACT_DIR}/src &&
+      
+      # Build steps
+      cd ${ARTIFACT_DIR}/src &&
+      python -m venv venv &&
+      source venv/bin/activate &&
+      pip install -r requirements.txt &&
+      python fundoo/manage.py makemigrations &&
+      python fundoo/manage.py migrate &&
+      
+      # Freeze dependencies and package
+      pip freeze > requirements.lock &&
+      tar -czf ${ARTIFACT_DIR}/django-app.tar.gz -C ${ARTIFACT_DIR}/src ."
+  displayName: 'Build + Migrate + Package'
 
-- stage: FetchCodeStage
-  displayName: 'Clone and Prepare Code'
-  jobs:
-  - job: clone
-    steps:
-    - script: |
-        ssh ${BACKEND_USER}@${BACKEND_IP} "
-          # Remove existing directory if it exists
-          rm -rf ${TMP_DIR} &&
-          # Create fresh directory
-          mkdir -p ${TMP_DIR} &&
-          # Clone repository
-          git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git ${TMP_DIR} "
-          # # Navigate to directory
-          # cd ${TMP_DIR} &&
-          # # Pull latest changes
-          # git pull origin main"
-      displayName: 'Clone and update repository'
+- script: |
+    # Download artifact from backend VM to Azure DevOps
+    scp ${BACKEND_USER}@${BACKEND_IP}:${ARTIFACT_DIR}/django-app.tar.gz $(Build.ArtifactStagingDirectory)/
+  displayName: 'Fetch artifact'
 
-- stage: BuildStage
-  displayName: 'Build Code'
-  jobs:
-    - job: build
-      steps: 
-      - script: |
-          ssh ${BACKEND_USER}@${BACKEND_IP} "
-            # Copy requirements file
-            cp ${TMP_DIR}/requirements.txt ${APP_DIR}/ &&
-            # Remove old directory if exists
-            sudo rm -rf ${APP_DIR}/fundoo &&
-            # Move new files
-            sudo mv ${TMP_DIR}/fundoo ${APP_DIR}/ "
-        displayName: 'Changes migrated'
-
-      - script: |
-          ssh ${BACKEND_USER}@${BACKEND_IP} "
-          cd ${APP_DIR} &&
-          source venv/bin/activate &&
-          pip install -r requirements.txt &&
-          sudo venv/bin/python3 fundoo/manage.py makemigrations &&
-          sudo venv/bin/python3 fundoo/manage.py migrate "
-        displayName: 'Build Successful'
-- stage: DeployStage
-  jobs:
-    - job: Deploy
-      steps:
-        - script: 
-            ssh ${BACKEND_USER}@${BACKEND_IP} "
-            sudo systemctl restart django "
-          displayName: 'Restart Server'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/django-app.tar.gz'
+    ArtifactName: 'django-app'
+  displayName: 'Publish artifact'
