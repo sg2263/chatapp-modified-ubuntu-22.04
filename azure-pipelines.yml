@@ -56,3 +56,19 @@ stages:
           sudo venv/bin/python3 fundoo/manage.py makemigrations &&
           sudo venv/bin/python3 fundoo/manage.py migrate "
         displayName: 'Build Successful'
+      - script: |
+          ssh ${BACKEND_USER}@${BACKEND_IP} "
+            cd ${APP_DIR} &&
+            zip -r app_artifact.zip fundoo requirements.txt"
+        displayName: 'Package artifact on backend'
+
+      - script: |
+          scp ${BACKEND_USER}@${BACKEND_IP}:${APP_DIR}/app_artifact.zip $(Build.ArtifactStagingDirectory)/
+        displayName: 'Copy artifact to build agent'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'chatapp-artifact'
+          publishLocation: 'Container'
+        displayName: 'Publish artifact to Azure DevOps'
