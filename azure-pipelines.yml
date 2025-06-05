@@ -19,6 +19,9 @@ stages:
         ssh ${BACKEND_USER}@${BACKEND_IP} "
           cd ${APP_DIR} &&
           sudo docker-compose down &&
+          rm -rf /backend/chatapp-modified-ubuntu-22.04 &&
+          git clone https://github.com/sg2263/chatapp-modified-ubuntu-22.04.git /backend/chatapp-modified-ubuntu-22.04 &&
+          
          # docker-compose pull &&
-          sudo docker-compose up --build -d"
+          sudo docker-compose up -d"
       displayName: 'Deploy Dockerized ChatApp'
