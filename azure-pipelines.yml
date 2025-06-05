@@ -5,7 +5,7 @@ pool:
   name: default
 
 variables:
-  BACKEND_IP: "74.179.83.146"
+  BACKEND_IP: "10.0.0.6"
   BACKEND_USER: "azureuser"
   APP_DIR: "/docker-chatapp"
 
@@ -19,6 +19,6 @@ stages:
         ssh ${BACKEND_USER}@${BACKEND_IP} "
           cd ${APP_DIR} &&
           docker-compose down &&
-          docker-compose pull &&
+         # docker-compose pull &&
           docker-compose up -d"
       displayName: 'Deploy Dockerized ChatApp'
