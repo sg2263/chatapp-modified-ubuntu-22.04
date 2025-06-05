@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: Azure Pipelines
+  name: default
 
 variables:
   BACKEND_IP: "74.179.83.146"
