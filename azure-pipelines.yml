@@ -20,5 +20,5 @@ stages:
           cd ${APP_DIR} &&
           sudo docker-compose down &&
          # docker-compose pull &&
-          sudo docker-compose up -d"
+          sudo docker-compose up --build -d"
       displayName: 'Deploy Dockerized ChatApp'
